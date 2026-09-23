@@ -72,7 +72,27 @@
     <button type="submit" id="btnGuardar">Guardar Programación</button>
     <button type="button" id="btnCancelar" class="btn-cancelar" style="display:none;" onclick="limpiarFormulario()">Cancelar Edición</button>
   </form>
+<!-- Seccion de Filtros y Estadisticas -->
+<div style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+  <div><table id="tablaMantenimientos"></table>
+    <label for="filtroTipo"><strong>Filtrar por Tipo:</strong></label><br>
+    <select id="filtroTipo" onchange="filtrarMantenimientos()" style="padding: 5px; border-radius: 4px;">
+      <option value="">Todos los tipos</option>
+      <option value="Preventivo">Preventivo</option>
+      <option value="Correctivo">Correctivo</option>
+    </select>
+  </div>
+  
+  <div>
+    <label for="buscarEquipo"><strong>Buscar por Equipo ID:</strong></label><br>
+    <input type="text" id="buscarEquipo" placeholder="Ej: 1, 2..." onkeyup="filtrarMantenimientos()" style="padding: 5px; border-radius: 4px;">
+  </div>
 
+  <div style="margin-left: auto; text-align: right;">
+    <small><strong>Total Registrados:</strong></small><br>
+    <span id="totalRegistros" style="font-size: 1.2em; font-weight: bold; color: #0d6efd;">0</span>
+  </div>
+</div>
   <h2>Mantenimientos Programados</h2>
   <table>
     <thead>

@@ -50,6 +50,7 @@ async function cargarMantenimientos() {
       </tr>
     `;
   });
+  filtrarMantenimientos();
 }
 
 function validarFormulario(payload) {
@@ -120,4 +121,28 @@ async function eliminarMantenimiento(id) {
       cargarMantenimientos();
     }
   }
+}// Función para filtrar los mantenimientos en tiempo real
+function filtrarMantenimientos() {
+  const tipoSeleccionado = document.getElementById('filtroTipo').value.toLowerCase();
+  const textoEquipo = document.getElementById('buscarEquipo').value.toLowerCase();
+  
+  const filas = document.querySelectorAll('#tablaMantenimientos tbody tr');
+  let contadorVisibles = 0;
+
+  filas.forEach(fila => {
+    const equipo = fila.children[0]?.innerText.toLowerCase() || '';
+    const tipo = fila.children[1]?.innerText.toLowerCase() || '';
+
+    const coincideTipo = !tipoSeleccionado || tipo.includes(tipoSeleccionado);
+    const coincideEquipo = !textoEquipo || equipo.includes(textoEquipo);
+
+    if (coincideTipo && coincideEquipo) {
+      fila.style.display = '';
+      contadorVisibles++;
+    } else {
+      fila.style.display = 'none';
+    }
+  });
+
+  document.getElementById('totalRegistros').innerText = contadorVisibles;
 }
