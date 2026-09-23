@@ -64,9 +64,11 @@ async function cargarMantenimientos() {
         <td>${m.equipos?.nombre || 'N/A'} (${m.equipos?.codigo || ''})</td>
         <td>${m.tipo_mantenimiento}</td>
         <td>${m.jornada}</td>
-        <td>${m.fecha}</td>
-        <td>${m.hora}</td>
+        <td>${m.fecha} ${m.hora}</td>
         <td>${m.tecnicos?.nombre || 'Sin asignar'}</td>
+        <td>
+          <button type="button" class="btn-eliminar" onclick="eliminarMantenimiento(${m.id})">Eliminar</button>
+        </td>
       </tr>
     `;
   });
@@ -99,4 +101,80 @@ function filtrarMantenimientos() {
 
   const totalElem = document.getElementById('totalRegistros');
   if (totalElem) totalElem.innerText = contadorVisibles;
+}
+
+// Listener para guardar o actualizar mantenimientos
+document.getElementById('formularioMantenimiento')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const id = document.getElementById('mantenimientoId').value;
+  const equipo_id = document.getElementById('selectEquipo').value;
+  const tipo_mantenimiento = document.getElementById('selectTipo').value;
+  const jornada = document.getElementById('selectJornada').value;
+  const fecha = document.getElementById('inputFecha').value;
+  const hora = document.getElementById('inputHora').value;
+  const tecnico_id = document.getElementById('selectTecnico').value;
+
+  if (!equipo_id || !tipo_mantenimiento || !jornada || !fecha || !hora || !tecnico_id) {
+    alert('Por favor, complete todos los campos obligatorios.');
+    return;
+  }
+
+  const datosMantenimiento = {
+    equipo_id,
+    tipo_mantenimiento,
+    jornada,
+    fecha,
+    hora,
+    tecnico_id
+  };
+
+  let error = null;
+
+  if (id) {
+    const res = await supabaseClient
+      .from('mantenimientos')
+      .update(datosMantenimiento)
+      .eq('id', id);
+    error = res.error;
+  } else {
+    const res = await supabaseClient
+      .from('mantenimientos')
+      .insert([datosMantenimiento]);
+    error = res.error;
+  }
+
+  if (error) {
+    console.error('Error al guardar:', error);
+    alert('Ocurrió un error al guardar el mantenimiento.');
+  } else {
+    limpiarFormulario();
+    cargarMantenimientos();
+  }
+});
+
+// Función para limpiar el formulario
+function limpiarFormulario() {
+  document.getElementById('formularioMantenimiento').reset();
+  document.getElementById('mantenimientoId').value = '';
+  document.getElementById('tituloFormulario').innerText = 'Programar Nuevo Mantenimiento';
+  document.getElementById('btnGuardar').innerText = 'Guardar Programación';
+  document.getElementById('btnCancelar').style.display = 'none';
+}
+
+// Función para eliminar un mantenimiento
+async function eliminarMantenimiento(id) {
+  if (confirm('¿Está seguro de que desea eliminar este mantenimiento?')) {
+    const { error } = await supabaseClient
+      .from('mantenimientos')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error al eliminar:', error);
+      alert('No se pudo eliminar el registro.');
+    } else {
+      cargarMantenimientos();
+    }
+  }
 }
